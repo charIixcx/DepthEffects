@@ -122,3 +122,14 @@ Use `config.yaml` or CLI flags to customize:
 
 Forge your code in this order, and any input portrait will ascend into a layered relic—fully automated, endlessly remixable. What artifact shall we summon first?
 
+
+## Usage
+
+Install dependencies and run the composer on images placed in `input/`:
+
+```bash
+pip install -r requirements.txt
+python relic_composer.py --use_midas --alpha_model u2net
+```
+
+Results are stored in `output/` with generated passes under `output/passes/`.
