@@ -81,6 +81,17 @@ def generate_alpha(image: np.ndarray, model: str = "u2net") -> np.ndarray:
     return mask
 
 
+def decompose_albedo_shading(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Approximate albedo and shading using a simple intrinsic decomposition."""
+    img_f = image.astype(np.float32) / 255.0
+    shading = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+    shading = cv2.GaussianBlur(shading, (0, 0), sigmaX=5, sigmaY=5)
+    shading = np.clip(shading, 0.1, 1.0)
+    shading_rgb = np.repeat(shading[..., None], 3, axis=2)
+    albedo = np.clip(img_f / shading_rgb, 0, 1)
+    return (albedo * 255).astype(np.uint8), (shading * 255).astype(np.uint8)
+
+
 # ------------------------------- Core Pipeline -------------------------------
 
 def process_image(path: Path, out_dir: Path, args: argparse.Namespace) -> None:
@@ -89,6 +100,8 @@ def process_image(path: Path, out_dir: Path, args: argparse.Namespace) -> None:
     depth_path = out_dir / "passes" / f"{path.stem}_depth.png"
     normal_path = out_dir / "passes" / f"{path.stem}_normal.png"
     alpha_path = out_dir / "passes" / f"{path.stem}_alpha.png"
+    albedo_path = out_dir / "passes" / f"{path.stem}_albedo.png"
+    shading_path = out_dir / "passes" / f"{path.stem}_shading.png"
 
     if args.use_midas and not depth_path.exists():
         depth = generate_depth(image)
@@ -102,6 +115,12 @@ def process_image(path: Path, out_dir: Path, args: argparse.Namespace) -> None:
     if not alpha_path.exists():
         alpha = generate_alpha(image, model=args.alpha_model)
         save_image(alpha, alpha_path)
+    if args.use_iiwnet and (not albedo_path.exists() or not shading_path.exists()):
+        albedo, shading = decompose_albedo_shading(image)
+        if not albedo_path.exists():
+            save_image(albedo, albedo_path)
+        if not shading_path.exists():
+            save_image(shading, shading_path)
 
     # Basic composite: overlay normal map edges for demonstration
     normal = load_image(normal_path)
@@ -119,6 +138,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", default="output", help="Output folder")
     parser.add_argument("--use_midas", action="store_true", help="Run MiDaS depth")
     parser.add_argument("--alpha_model", default="u2net", help="Alpha model to use")
+    parser.add_argument("--use_iiwnet", action="store_true", help="Run intrinsic decomposition")
     parser.add_argument("--triptych", action="store_true", help="Export triptych view")
     return parser
 
