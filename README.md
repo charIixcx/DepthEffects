@@ -108,11 +108,11 @@ Use `config.yaml` or CLI flags to customize:
 
 ## 🚀 Next Steps & Task Breakdown
 
-- [ ] Draft `relic_composer.py` skeleton with CLI parser.
-- [ ] Integrate MiDaS depth inference module.
-- [ ] Script depth → normal conversion.
-- [ ] Plug in U²-Net or SAM for auto-alpha.
-- [ ] Add IIWNet for albedo-shading split.
+- [x] Draft `relic_composer.py` skeleton with CLI parser.
+- [x] Integrate MiDaS depth inference module.
+- [x] Script depth → normal conversion.
+- [x] Plug in U²-Net or SAM for auto-alpha.
+- [x] Add IIWNet for albedo-shading split.
 - [ ] Implement specular/roughness estimation.
 - [ ] Composite passes (rims, gleam, haze) with OpenCV.
 - [ ] Export outputs and triptychs.
@@ -129,7 +129,7 @@ Install dependencies and run the composer on images placed in `input/`:
 
 ```bash
 pip install -r requirements.txt
-python relic_composer.py --use_midas --alpha_model u2net
+python relic_composer.py --use_midas --alpha_model u2net --use_iiwnet
 ```
 
 Results are stored in `output/` with generated passes under `output/passes/`.
