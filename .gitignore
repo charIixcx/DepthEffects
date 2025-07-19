@@ -1,4 +1,6 @@
 __pycache__/
-output/
-input/
+output/*
+!output/README.md
+input/*
+!input/README.md
 *.pyc
