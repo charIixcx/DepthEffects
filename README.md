@@ -3,6 +3,8 @@
 # 🕯️ Chapter I: Single-Source Invocation
 
 Place your portrait image (.png/.jpg) into the `/input/` folder.
+Sample `input/` and `output/` directories with README files are provided for
+testing the pipeline.
 
 The system will automatically detect missing passes and use AI models to generate them.
 
@@ -21,22 +23,14 @@ The system will automatically detect missing passes and use AI models to generat
 
 ## ⚙️ Chapter III: Invocation Engine Setup
 
-1. Create a `requirements.txt` file with the following dependencies:
-    ```
-    torch
-    torchvision
-    opencv-python
-    numpy
-    pillow
-    midas
-    u2net or segment-anything
-    iiwnet (optional)
-    ```
-2. Install dependencies:
+1. Install the pinned dependencies from `requirements.txt`:
     ```bash
     pip install -r requirements.txt
     ```
-3. Scaffold `relic_composer.py` with CLI flags:
+   The `u2net` package is optional and may require manual installation via
+   `pip install git+https://github.com/NathanUA/U-2-Net.git` if not available on
+   PyPI.
+2. Scaffold `relic_composer.py` with CLI flags:
     - `--input` (input folder)
     - `--output` (output folder)
     - `--use_midas`
@@ -116,8 +110,8 @@ Use `config.yaml` or CLI flags to customize:
 - [ ] Implement specular/roughness estimation.
 - [ ] Composite passes (rims, gleam, haze) with OpenCV.
 - [ ] Export outputs and triptychs.
-- [ ] Document usage in `README.md`.
-- [ ] Provide sample `/input/` and `/output/` for testing.
+- [x] Document usage in `README.md`.
+- [x] Provide sample `/input/` and `/output/` for testing.
 - [ ] *(Bonus)* Build a Streamlit GUI for live preview.
 
 Forge your code in this order, and any input portrait will ascend into a layered relic—fully automated, endlessly remixable. What artifact shall we summon first?
@@ -125,7 +119,9 @@ Forge your code in this order, and any input portrait will ascend into a layered
 
 ## Usage
 
-Install dependencies and run the composer on images placed in `input/`:
+Install dependencies and run the composer on images placed in `input/`.
+The processing pipeline lives in the `composer/` package with a thin wrapper
+`relic_composer.py` for CLI usage:
 
 ```bash
 pip install -r requirements.txt
