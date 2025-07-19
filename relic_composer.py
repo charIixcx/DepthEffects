@@ -94,6 +94,11 @@ def decompose_albedo_shading(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]
 
 # ------------------------------- Core Pipeline -------------------------------
 
+def _create_depth(image: np.ndarray, use_midas: bool) -> np.ndarray:
+    """Return a depth map using MiDaS if requested, else zeros."""
+    return generate_depth(image) if use_midas else np.zeros(image.shape[:2], dtype=np.uint8)
+
+
 def process_image(path: Path, out_dir: Path, args: argparse.Namespace) -> None:
     """Process a single image path."""
     image = load_image(path)
@@ -103,11 +108,11 @@ def process_image(path: Path, out_dir: Path, args: argparse.Namespace) -> None:
     albedo_path = out_dir / "passes" / f"{path.stem}_albedo.png"
     shading_path = out_dir / "passes" / f"{path.stem}_shading.png"
 
-    if args.use_midas and not depth_path.exists():
-        depth = generate_depth(image)
-        save_image(depth, depth_path)
+    if depth_path.exists():
+        depth = load_image(depth_path)
     else:
-        depth = load_image(depth_path) if depth_path.exists() else generate_depth(image)
+        depth = _create_depth(image, args.use_midas)
+        save_image(depth, depth_path)
 
     if not normal_path.exists():
         normal = depth_to_normal(depth)
